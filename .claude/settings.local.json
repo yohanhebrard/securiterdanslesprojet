@@ -3,7 +3,9 @@
     "allow": [
       "Bash(git init:*)",
       "Bash(touch:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\n🎉 Initial commit: SecureShare - Projet fil rouge SaaS sécurisé\n\n✨ Livrables professionnels complets:\n- 📋 Exigences de sécurité \\(OWASP, ISO 27001, RGPD\\)\n- ⚠️ Analyse de risques \\(méthode EBIOS adaptée\\)\n- 📝 Backlog sécurité priorisé \\(25 user stories\\)\n- 📊 KPIs/KRIs de sécurité \\(10 indicateurs\\)\n- 🏗️ Architecture technique détaillée\n- 🚀 Manuel de déploiement\n\n🔧 Infrastructure DevSecOps:\n- Docker Compose multi-services \\(Backend, Frontend, PostgreSQL, Redis, MinIO, Vault, ClamAV\\)\n- Pipeline CI/CD GitHub Actions \\(SAST, DAST, SCA, Secret Scanning\\)\n- Configuration Prometheus + Grafana\n\n📦 Structure projet complète:\n- Backend: FastAPI + Python 3.11\n- Frontend: React 18 + TypeScript + Vite\n- Base de données: PostgreSQL 16\n- Cache: Redis 7\n- Stockage: MinIO \\(S3-compatible\\)\n- Secrets: HashiCorp Vault\n- Antivirus: ClamAV\n\n🔒 Sécurité intégrée:\n- Chiffrement AES-256-GCM\n- TLS 1.3 strict\n- Rate limiting\n- Scan antivirus\n- Suppression atomique\n- Logs d''audit RGPD-compliant\n\n🎓 Projet pédagogique fil rouge - Sécurité intégrée dès la conception\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
