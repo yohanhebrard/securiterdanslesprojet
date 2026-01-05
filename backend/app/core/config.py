@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     # API
     API_V1_PREFIX: str = "/api/v1"
+    API_BASE_URL: str = "http://localhost:8000"
 
     # Database
     DATABASE_URL: str = "postgresql://secureshare:devpassword@postgres:5432/secureshare"

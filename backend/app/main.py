@@ -4,6 +4,11 @@ SecureShare Backend - Main Application Entry Point
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.config import settings
+from app.api.v1 import api_router
+from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
+
 app = FastAPI(
     title="SecureShare API",
     description="Secure file sharing platform with encryption and one-time downloads",
@@ -12,14 +17,23 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# Security Headers Middleware (applied first)
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Rate Limiting Middleware
+app.add_middleware(RateLimitMiddleware)
+
 # CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8080"],
-    allow_credentials=True,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Include API routers
+app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")
