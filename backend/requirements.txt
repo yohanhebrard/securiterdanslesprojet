@@ -53,13 +53,13 @@ pytest-cov==4.1.0
 httpx==0.25.2  # For testing async endpoints
 
 # Security Scanning (Dev)
-bandit==1.7.5
-safety==2.3.5
+bandit==1.7.9
+safety==3.2.0
 
 # Code Quality (Dev)
-black==23.12.0
-flake8==6.1.0
-mypy==1.7.1
+black==24.3.0
+flake8==7.0.0
+mypy==1.9.0
 isort==5.13.2
 
 # Utilities
