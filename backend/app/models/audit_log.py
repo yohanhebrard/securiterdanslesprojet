@@ -29,8 +29,8 @@ class AuditLog(Base):
     ip_hash = Column(String(64), nullable=False, index=True)
     user_agent_hash = Column(String(64), nullable=True)
 
-    # Event metadata (flexible JSON field)
-    metadata = Column(JSON, nullable=True)
+    # Event metadata (flexible JSON field) - renamed to avoid SQLAlchemy reserved word
+    event_metadata = Column("metadata", JSON, nullable=True)
 
     # Timestamp
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
