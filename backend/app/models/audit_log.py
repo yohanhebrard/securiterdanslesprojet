@@ -2,7 +2,7 @@
 Audit Log model - Tracks all security events
 """
 from datetime import datetime
-from sqlalchemy import Column, String, BigInteger, DateTime, JSON
+from sqlalchemy import Column, String, Integer, DateTime, JSON
 from sqlalchemy import ForeignKey
 
 from app.core.database import Base
@@ -14,8 +14,8 @@ class AuditLog(Base):
 
     __tablename__ = "audit_logs"
 
-    # Primary key
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    # Primary key - Integer for SQLite autoincrement compatibility
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
     # Event information
     event_type = Column(
