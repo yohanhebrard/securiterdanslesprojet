@@ -2,6 +2,7 @@
 File Download Endpoint
 Handles secure one-time file download with atomic deletion
 """
+import os
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Depends, Request
@@ -23,6 +24,11 @@ router = APIRouter()
 # Initialize services
 token_service = TokenService()
 storage_service = StorageService()
+
+
+def _is_test_mode() -> bool:
+    """Check if running in test mode (SQLite doesn't support FOR UPDATE)"""
+    return os.environ.get("ENVIRONMENT") == "test"
 
 
 @router.get("/info/{token}", response_model=FileInfoResponse)
@@ -125,12 +131,11 @@ async def download_file(
     token_hash = token_service.hash_token(token)
 
     # Query file from database with row-level locking (FOR UPDATE)
-    file_record = (
-        db.query(FileModel)
-        .filter(FileModel.token_hash == token_hash)
-        .with_for_update()
-        .first()
-    )
+    # Note: SQLite doesn't support FOR UPDATE, so skip in test mode
+    query = db.query(FileModel).filter(FileModel.token_hash == token_hash)
+    if not _is_test_mode():
+        query = query.with_for_update()
+    file_record = query.first()
 
     if not file_record:
         raise HTTPException(status_code=404, detail="File not found")
