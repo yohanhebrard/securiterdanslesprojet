@@ -17,13 +17,12 @@ from app.models.audit_log import AuditLog
 from app.schemas.file import FileInfoResponse
 from app.services.token_service import TokenService
 from app.services.encryption import encryption_service
-from app.services.storage import StorageService
+from app.services.storage import storage_service
 
 router = APIRouter()
 
 # Initialize services
 token_service = TokenService()
-storage_service = StorageService()
 
 
 def _is_test_mode() -> bool:

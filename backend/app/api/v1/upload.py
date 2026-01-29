@@ -16,14 +16,13 @@ from app.models.audit_log import AuditLog
 from app.schemas.file import FileUploadResponse
 from app.services.token_service import TokenService
 from app.services.encryption import encryption_service
-from app.services.storage import StorageService
+from app.services.storage import storage_service
 from app.services.antivirus import antivirus_service
 
 router = APIRouter()
 
 # Initialize services
 token_service = TokenService()
-storage_service = StorageService()
 
 
 @router.post("", response_model=FileUploadResponse, status_code=201)
