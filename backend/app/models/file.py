@@ -4,9 +4,9 @@ File model - Stores metadata for uploaded files
 import uuid
 from datetime import datetime, timedelta
 from sqlalchemy import Column, String, BigInteger, DateTime, Integer, JSON, Boolean
-from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.database import Base
+from app.core.types import GUID
 
 
 class File(Base):
@@ -15,7 +15,7 @@ class File(Base):
     __tablename__ = "files"
 
     # Primary key
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
 
     # Token (hashed)
     token_hash = Column(String(64), unique=True, nullable=False, index=True)

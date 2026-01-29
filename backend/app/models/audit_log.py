@@ -3,10 +3,10 @@ Audit Log model - Tracks all security events
 """
 from datetime import datetime
 from sqlalchemy import Column, String, BigInteger, DateTime, JSON
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import ForeignKey
 
 from app.core.database import Base
+from app.core.types import GUID
 
 
 class AuditLog(Base):
@@ -23,7 +23,7 @@ class AuditLog(Base):
     )  # upload, download, delete, error, abuse
 
     # Reference to file (nullable if file is deleted)
-    file_id = Column(UUID(as_uuid=True), ForeignKey("files.id", ondelete="SET NULL"), nullable=True)
+    file_id = Column(GUID(), ForeignKey("files.id", ondelete="SET NULL"), nullable=True)
 
     # User tracking (anonymized)
     ip_hash = Column(String(64), nullable=False, index=True)
