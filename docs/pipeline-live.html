@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>SecureShare – Pipeline CI/CD Live</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e6edf3;
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, #238636, #2ea043);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    header h1 { font-size: 20px; font-weight: 600; }
+    header p  { font-size: 12px; color: #7d8590; margin-top: 3px; }
+    .refresh-btn {
+      margin-left: auto;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .refresh-btn:hover { background: #30363d; }
+    .spin { animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RUN BANNER ── */
+    .run-banner {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .run-status-dot {
+      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-success { background: #2ea043; }
+    .dot-failure { background: #da3633; }
+    .dot-running { background: #d29922; animation: pulse 1.5s ease-in-out infinite; }
+    .dot-pending { background: #7d8590; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .run-title   { font-weight: 600; font-size: 14px; }
+    .run-meta    { font-size: 12px; color: #7d8590; margin-top: 2px; }
+    .run-badge   { margin-left: auto; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-success { background: #0d2e1a; color: #3fb950; border: 1px solid #238636; }
+    .badge-failure { background: #2d0e0e; color: #f85149; border: 1px solid #da3633; }
+    .badge-running { background: #2e1f00; color: #e3b341; border: 1px solid #9e6a03; }
+
+    /* ── PHASES ── */
+    .phase-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1px; color: #7d8590; margin-bottom: 10px; margin-top: 20px;
+    }
+    .phase-label:first-of-type { margin-top: 0; }
+
+    .jobs-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    /* ── JOB CARD ── */
+    .job-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 14px 16px;
+      min-width: 180px;
+      max-width: 220px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color .2s, transform .1s;
+    }
+    .job-card:hover { border-color: #58a6ff; transform: translateY(-1px); }
+    .job-card.success { border-left: 3px solid #2ea043; }
+    .job-card.failure { border-left: 3px solid #da3633; }
+    .job-card.running { border-left: 3px solid #d29922; }
+    .job-card.skipped { border-left: 3px solid #484f58; opacity: .6; }
+    .job-card.pending { border-left: 3px solid #484f58; }
+
+    .jc-header { display: flex; align-items: center; gap: 8px; }
+    .jc-icon { font-size: 16px; flex-shrink: 0; }
+    .jc-name { font-size: 13px; font-weight: 600; color: #e6edf3; line-height: 1.3; }
+    .jc-dur  { font-size: 11px; color: #7d8590; margin-top: 1px; font-family: monospace; }
+
+    .jc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag {
+      font-size: 10px; padding: 2px 7px; border-radius: 20px;
+      font-weight: 500; border: 1px solid transparent;
+    }
+    .tag.green  { background: #0d2e1a; color: #3fb950; border-color: #238636; }
+    .tag.blue   { background: #0c2446; color: #58a6ff; border-color: #1f6feb; }
+    .tag.purple { background: #2e1d4a; color: #bc8cff; border-color: #6e40c9; }
+    .tag.orange { background: #2d1f00; color: #e3b341; border-color: #9e6a03; }
+    .tag.red    { background: #2d0e0e; color: #f85149; border-color: #da3633; }
+    .tag.gray   { background: #1c2128; color: #7d8590; border-color: #30363d; }
+
+    /* ── SKELETON ── */
+    .skeleton {
+      background: linear-gradient(90deg, #21262d 25%, #30363d 50%, #21262d 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px; height: 14px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ── SUMMARY ── */
+    .summary {
+      display: flex;
+      gap: 16px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .s-item { display: flex; flex-direction: column; gap: 2px; }
+    .s-val  { font-size: 20px; font-weight: 700; }
+    .s-lbl  { font-size: 11px; color: #7d8590; }
+    .sep    { width: 1px; background: #21262d; align-self: stretch; }
+
+    .error-box {
+      background: #2d0e0e; border: 1px solid #da3633; border-radius: 8px;
+      padding: 16px; color: #f85149; font-size: 13px;
+    }
+
+    footer {
+      margin-top: 32px; font-size: 11px; color: #484f58;
+      display: flex; justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🔒</div>
+  <div>
+    <h1>SecureShare &mdash; Pipeline CI/CD DevSecOps</h1>
+    <p id="subtitle">Chargement en cours…</p>
+  </div>
+  <button class="refresh-btn" onclick="load()">
+    <span id="refresh-icon">↻</span> Actualiser
+  </button>
+</header>
+
+<div id="run-banner"></div>
+<div id="content"><div class="skeleton" style="height:80px;margin-bottom:12px"></div><div class="skeleton" style="height:120px"></div></div>
+<div id="summary-bar"></div>
+
+<footer>
+  <span>SecureShare &mdash; Projet Fil Rouge DevSecOps &mdash; 2026</span>
+  <span id="last-update"></span>
+</footer>
+
+<script>
+const OWNER = 'yohanhebrard';
+const REPO  = 'securiterdanslesprojet';
+const WORKFLOW = 'ci.yml';
+
+// Map job names → tags décoratifs
+const JOB_META = {
+  'Backend Tests':        { tags: [['pytest','blue'],['33 tests','blue'],['70% cov','orange']], icon: '🧪' },
+  'Backend Security Scan':{ tags: [['Bandit','purple'],['Safety','purple'],['Semgrep','purple']], icon: '🔍' },
+  'Frontend Tests':       { tags: [['Vite build','blue'],['React 18','blue']], icon: '⚛️' },
+  'Frontend Security Scan':{ tags: [['ESLint Sec','purple'],['npm audit','purple']], icon: '🔍' },
+  'Secret Scanning':      { tags: [['TruffleHog','orange']], icon: '🔐' },
+  'Docker Build & Scan':  { tags: [['Trivy','orange'],['multi-stage','gray']], icon: '🐳' },
+  'Security Summary':     { tags: [['7 outils','green']], icon: '📊' },
+  'Push Docker Images':   { tags: [['ghcr.io','blue']], icon: '📦' },
+  'Deploy to Staging':    { tags: [['staging','orange']], icon: '🚀' },
+  'Deploy to Production': { tags: [['production','green'],['master','blue']], icon: '🌐' },
+  'Send Notifications':   { tags: [['Slack','gray']], icon: '🔔' },
+};
+
+const PHASES = [
+  { label: '⚙️  Phase 1 – Intégration Continue (CI)', jobs: ['Backend Tests','Backend Security Scan','Frontend Tests','Frontend Security Scan','Secret Scanning'] },
+  { label: '🐳  Phase 2 – Build & Container Scan',     jobs: ['Docker Build & Scan','Security Summary'] },
+  { label: '🚀  Phase 3 – Déploiement Continu (CD)',   jobs: ['Push Docker Images','Deploy to Staging','Deploy to Production','Send Notifications'] },
+];
+
+function statusIcon(s) {
+  if (s === 'success')   return '✓';
+  if (s === 'failure')   return '✗';
+  if (s === 'in_progress' || s === 'queued') return '◌';
+  if (s === 'skipped')   return '⊘';
+  return '…';
+}
+function conclusionClass(c, s) {
+  if (s === 'in_progress' || s === 'queued') return 'running';
+  if (c === 'success') return 'success';
+  if (c === 'failure' || c === 'timed_out') return 'failure';
+  if (c === 'skipped' || c === 'cancelled') return 'skipped';
+  return 'pending';
+}
+function fmtDuration(start, end) {
+  if (!start) return '';
+  const s = Math.round((new Date(end || Date.now()) - new Date(start)) / 1000);
+  if (s < 60) return `${s}s`;
+  return `${Math.floor(s/60)}m ${s%60}s`;
+}
+function fmtDate(d) {
+  return new Date(d).toLocaleString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+async function load() {
+  const icon = document.getElementById('refresh-icon');
+  icon.classList.add('spin');
+
+  try {
+    // 1. Dernier run du workflow
+    const runsRes = await fetch(
+      `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=1`,
+      { headers: { 'Accept': 'application/vnd.github+json' } }
+    );
+    if (!runsRes.ok) throw new Error(`GitHub API: ${runsRes.status} – vérifiez que le repo est public`);
+    const runsData = await runsRes.json();
+    const run = runsData.workflow_runs?.[0];
+    if (!run) throw new Error('Aucun run trouvé.');
+
+    // 2. Jobs du run
+    const jobsRes = await fetch(run.jobs_url, { headers: { 'Accept': 'application/vnd.github+json' } });
+    const jobsData = await jobsRes.json();
+    const jobs = jobsData.jobs || [];
+
+    renderBanner(run);
+    renderJobs(jobs, run);
+    renderSummary(run, jobs);
+
+    document.getElementById('subtitle').textContent =
+      `yohanhebrard / securiterdanslesprojet · branch: ${run.head_branch} · GitHub Actions`;
+    document.getElementById('last-update').textContent =
+      'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
+
+  } catch(e) {
+    document.getElementById('content').innerHTML =
+      `<div class="error-box">❌ Impossible de charger les données GitHub Actions.<br><br><strong>${e.message}</strong><br><br>Le dépôt doit être <strong>public</strong> pour que l'API fonctionne sans token.</div>`;
+    document.getElementById('run-banner').innerHTML = '';
+  } finally {
+    icon.classList.remove('spin');
+  }
+}
+
+function renderBanner(run) {
+  const cls = conclusionClass(run.conclusion, run.status);
+  const dot = cls === 'success' ? 'dot-success' : cls === 'failure' ? 'dot-failure' : cls === 'running' ? 'dot-running' : 'dot-pending';
+  const badgeCls = cls === 'success' ? 'badge-success' : cls === 'failure' ? 'badge-failure' : 'badge-running';
+  const badgeTxt = cls === 'success' ? '✓ Réussi' : cls === 'failure' ? '✗ Échec' : '◌ En cours';
+
+  document.getElementById('run-banner').innerHTML = `
+    <div class="run-banner">
+      <div class="run-status-dot ${dot}"></div>
+      <div>
+        <div class="run-title">${run.display_title || run.head_commit?.message?.split('\n')[0] || 'Run CI/CD'}</div>
+        <div class="run-meta">
+          Run #${run.run_number} &nbsp;·&nbsp; ${fmtDate(run.created_at)}
+          &nbsp;·&nbsp; Durée : ${fmtDuration(run.created_at, run.updated_at)}
+          &nbsp;·&nbsp; Déclenché par <strong>${run.triggering_actor?.login || '?'}</strong>
+        </div>
+      </div>
+      <a href="${run.html_url}" target="_blank" class="run-badge ${badgeCls}">${badgeTxt}</a>
+    </div>`;
+}
+
+function renderJobs(jobs, run) {
+  const byName = {};
+  jobs.forEach(j => byName[j.name] = j);
+
+  let html = '';
+  PHASES.forEach(phase => {
+    html += `<div class="phase-label">${phase.label}</div><div class="jobs-grid">`;
+    phase.jobs.forEach(name => {
+      const j = byName[name];
+      const meta = JOB_META[name] || { tags: [], icon: '⚙️' };
+      if (!j) {
+        // job pas encore lancé
+        html += `<div class="job-card pending">
+          <div class="jc-header">
+            <span class="jc-icon">${meta.icon}</span>
+            <div><div class="jc-name">${name}</div><div class="jc-dur">En attente…</div></div>
+          </div></div>`;
+        return;
+      }
+      const cls = conclusionClass(j.conclusion, j.status);
+      const icon = statusIcon(j.conclusion || j.status);
+      const dur = fmtDuration(j.started_at, j.completed_at);
+      const tagHtml = meta.tags.map(([t,c]) => `<span class="tag ${c}">${t}</span>`).join('');
+      // ajouter tag status si failure
+      const extraTag = cls === 'failure' ? `<span class="tag red">✗ Échec</span>` :
+                       cls === 'success' ? `<span class="tag green">✓ OK</span>` :
+                       cls === 'running' ? `<span class="tag orange">◌ Actif</span>` : '';
+
+      html += `<a class="job-card ${cls}" href="${j.html_url}" target="_blank">
+        <div class="jc-header">
+          <span class="jc-icon">${meta.icon}</span>
+          <div>
+            <div class="jc-name">${j.name}</div>
+            <div class="jc-dur">${dur ? '⏱ ' + dur : '…'}</div>
+          </div>
+        </div>
+        <div class="jc-tags">${tagHtml}${extraTag}</div>
+      </a>`;
+    });
+    html += `</div>`;
+  });
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function renderSummary(run, jobs) {
+  const success = jobs.filter(j => j.conclusion === 'success').length;
+  const total   = jobs.length;
+  const failed  = jobs.filter(j => j.conclusion === 'failure').length;
+
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="summary">
+      <div class="s-item"><span class="s-val" style="color:#3fb950">${success}/${total}</span><span class="s-lbl">Jobs réussis</span></div>
+      <div class="sep"></div>
+      <div class="s-item"><span class="s-val" style="color:${failed>0?'#f85149':'#3fb950'}">${failed}</span><span class="s-lbl">Échecs</span></div>
+      <div class="sep"></div>
+      <div class="s-item"><span class="s-val" style="color:#58a6ff">70%</span><span class="s-lbl">Couverture code</span></div>
+      <div class="sep"></div>
+      <div class="s-item"><span class="s-val" style="color:#3fb950">0</span><span class="s-lbl">Secrets détectés</span></div>
+      <div class="sep"></div>
+      <div class="s-item"><span class="s-val" style="color:#3fb950">0</span><span class="s-lbl">CVE critiques</span></div>
+      <div class="sep"></div>
+      <div class="s-item"><span class="s-val" style="color:#e3b341">7</span><span class="s-lbl">Outils sécu</span></div>
+      <div class="sep"></div>
+      <div class="s-item"><span class="s-val" style="color:#bc8cff">AES-256</span><span class="s-lbl">Chiffrement</span></div>
+    </div>`;
+}
+
+load();
+</script>
+</body>
+</html>
