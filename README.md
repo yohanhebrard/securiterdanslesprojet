@@ -248,7 +248,7 @@ Consultez le dossier [`docs/`](docs/) pour :
 ## 👥 Équipe
 
 - **Yohan Hebrard**
-- **Développeurs**
-- **Responsable sécurité**
+- **Maxime Aballan**
+- **Mehdi Fandi**
 
 
