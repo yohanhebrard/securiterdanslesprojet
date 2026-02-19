@@ -515,6 +515,3 @@ Ce document doit être revu :
 - **EBIOS Risk Manager (ANSSI)** : https://www.ssi.gouv.fr/guide/ebios-risk-manager-the-method/
 - **ISO/IEC 27005:2018** : Gestion des risques de sécurité de l'information
 
----
-
-**⚠️ Document confidentiel - Diffusion restreinte**

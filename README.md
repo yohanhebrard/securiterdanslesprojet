@@ -247,14 +247,8 @@ Consultez le dossier [`docs/`](docs/) pour :
 
 ## 👥 Équipe
 
-- **Chef de projet**: [Nom]
-- **Développeurs**: [Noms]
-- **Responsable sécurité**: [Nom]
+- **Yohan Hebrard**
+- **Développeurs**
+- **Responsable sécurité**
 
-## 📝 Licence
 
-Projet éducatif - Tous droits réservés
-
-## 🙏 Remerciements
-
-Projet réalisé dans le cadre du fil rouge "Sécurité intégrée dans les projets".

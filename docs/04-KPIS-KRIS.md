@@ -492,6 +492,3 @@ Les seuils sont ajustés si :
 | **Product Owner** | Arbitrage objectifs, priorisation actions |
 | **DPO** | KPIs/KRIs RGPD, audits |
 
----
-
-**📊 Document vivant - Révision trimestrielle obligatoire**

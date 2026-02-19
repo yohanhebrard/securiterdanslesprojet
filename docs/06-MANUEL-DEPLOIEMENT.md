@@ -627,16 +627,3 @@ kubectl exec -it backend-pod -n secureshare-prod -- \
 - [04-KPIS-KRIS.md](04-KPIS-KRIS.md) - Indicateurs
 - [05-ARCHITECTURE.md](05-ARCHITECTURE.md) - Architecture technique
 
----
-
-## 12. Support
-
-**En cas de problème critique** :
-1. Consulter les logs : `kubectl logs -f deployment/backend -n secureshare-prod`
-2. Vérifier le dashboard Grafana : https://grafana.example.com
-3. Contacter l'équipe : security@example.com
-4. Incident majeur : Activer procédure d'incident (PagerDuty)
-
----
-
-**🚀 Bon déploiement !**

@@ -642,6 +642,3 @@ Vault: 3 nodes HA avec Raft storage
 
 Voir [06-MANUEL-DEPLOIEMENT.md](06-MANUEL-DEPLOIEMENT.md)
 
----
-
-**🏗️ Document de référence technique - Révision à chaque changement architectural**

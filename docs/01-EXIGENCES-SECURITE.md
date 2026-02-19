@@ -380,6 +380,3 @@ En cas d'impossibilité technique de respecter une exigence CRITIQUE :
 **Container scanning** : Trivy, Clair, Anchore
 **Pentest** : Metasploit, Nmap, Nikto
 
----
-
-**🔒 Document confidentiel - Usage interne uniquement**

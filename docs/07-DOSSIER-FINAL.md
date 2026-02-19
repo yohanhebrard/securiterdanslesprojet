@@ -3,7 +3,6 @@
 **Projet** : SecureShare – Plateforme SaaS de partage de fichiers éphémères et sécurisés
 **Version** : 1.0
 **Date de rendu** : 19 Février 2026
-**Oral** : 12 Mars 2026
 **Statut** : ✅ Rendu final
 
 ---
@@ -407,6 +406,3 @@ securiterdanslesprojet/
 └── docker-compose.yml            # 9 services orchestrés
 ```
 
----
-
-**🔒 SecureShare – Secure by Design, Ephemeral by Nature**
