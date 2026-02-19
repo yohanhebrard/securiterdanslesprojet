@@ -242,6 +242,8 @@ Consultez le dossier [`docs/`](docs/) pour :
 - [Backlog sécurité](docs/03-BACKLOG-SECURITE.md)
 - [KPIs/KRIs détaillés](docs/04-KPIS-KRIS.md)
 - [Architecture technique](docs/05-ARCHITECTURE.md)
+- [Manuel de déploiement](docs/06-MANUEL-DEPLOIEMENT.md)
+- [**Dossier final**](docs/07-DOSSIER-FINAL.md)
 
 ## 👥 Équipe
 
