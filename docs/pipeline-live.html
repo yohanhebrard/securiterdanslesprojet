@@ -2,200 +2,298 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SecureShare – Pipeline CI/CD Live</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      /* Palette Premium Dark Mode */
+      --bg-main: #050505;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --bg-card-hover: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.08);
+      
+      --text-main: #ededed;
+      --text-muted: #a1a1aa;
+      --text-faint: #71717a;
+      
+      /* Couleurs d'accentuation vibrantes */
+      --color-success: #10b981; /* Emerald */
+      --color-success-bg: rgba(16, 185, 129, 0.1);
+      --color-failure: #f43f5e; /* Rose */
+      --color-failure-bg: rgba(244, 63, 94, 0.1);
+      --color-running: #f59e0b; /* Amber */
+      --color-running-bg: rgba(245, 158, 11, 0.1);
+      --color-accent: #3b82f6; /* Blue */
+      --color-accent-bg: rgba(59, 130, 246, 0.1);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #0d1117;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #e6edf3;
+      background: var(--bg-main);
+      background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text-main);
       min-height: 100vh;
-      padding: 40px;
+      padding: 40px 20px;
+      -webkit-font-smoothing: antialiased;
     }
 
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── HEADER ── */
     header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 36px;
+      gap: 20px;
+      margin-bottom: 40px;
     }
     .logo {
-      width: 44px; height: 44px;
-      background: linear-gradient(135deg, #238636, #2ea043);
-      border-radius: 10px;
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
+      font-size: 20px;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    header h1 { font-size: 20px; font-weight: 600; }
-    header p  { font-size: 12px; color: #7d8590; margin-top: 3px; }
+    header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+    header p  { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
+    
     .refresh-btn {
       margin-left: auto;
-      background: #21262d;
-      border: 1px solid #30363d;
-      color: #e6edf3;
-      padding: 6px 14px;
-      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 18px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 12px;
-      display: flex; align-items: center; gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
     }
-    .refresh-btn:hover { background: #30363d; }
+    .refresh-btn:hover { 
+      background: var(--bg-card-hover); 
+      border-color: rgba(255, 255, 255, 0.2);
+    }
     .spin { animation: spin 1s linear infinite; display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── RUN BANNER ── */
+    /* ── RUN BANNER (Glassmorphism) ── */
     .run-banner {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin-bottom: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 40px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
       flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
     }
-    .run-status-dot {
-      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    /* Subtle glow line at the top of the banner */
+    .run-banner::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
     }
-    .dot-success { background: #2ea043; }
-    .dot-failure { background: #da3633; }
-    .dot-running { background: #d29922; animation: pulse 1.5s ease-in-out infinite; }
-    .dot-pending { background: #7d8590; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-    .run-title   { font-weight: 600; font-size: 14px; }
-    .run-meta    { font-size: 12px; color: #7d8590; margin-top: 2px; }
-    .run-badge   { margin-left: auto; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .badge-success { background: #0d2e1a; color: #3fb950; border: 1px solid #238636; }
-    .badge-failure { background: #2d0e0e; color: #f85149; border: 1px solid #da3633; }
-    .badge-running { background: #2e1f00; color: #e3b341; border: 1px solid #9e6a03; }
+    .run-status-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .dot-success { background: var(--color-success); box-shadow: 0 0 12px var(--color-success); }
+    .dot-failure { background: var(--color-failure); box-shadow: 0 0 12px var(--color-failure); }
+    .dot-running { background: var(--color-running); box-shadow: 0 0 12px var(--color-running); animation: pulse 2s infinite; }
+    .dot-pending { background: var(--text-faint); }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+    .run-title   { font-weight: 600; font-size: 16px; margin-bottom: 6px; }
+    .run-meta    { font-size: 13px; color: var(--text-muted); }
+    .run-meta strong { color: var(--text-main); font-weight: 500; }
+    
+    .run-badge   { 
+      margin-left: auto; padding: 6px 14px; border-radius: 8px; 
+      font-size: 12px; font-weight: 600; text-decoration: none; 
+      transition: all 0.2s; border: 1px solid transparent;
+    }
+    .run-badge:hover { filter: brightness(1.2); }
+    .badge-success { background: var(--color-success-bg); color: var(--color-success); border-color: rgba(16, 185, 129, 0.2); }
+    .badge-failure { background: var(--color-failure-bg); color: var(--color-failure); border-color: rgba(244, 63, 94, 0.2); }
+    .badge-running { background: var(--color-running-bg); color: var(--color-running); border-color: rgba(245, 158, 11, 0.2); }
 
     /* ── PHASES ── */
+    .fade-in { animation: fadeIn 0.5s ease-out forwards; opacity: 0; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
     .phase-label {
       font-size: 11px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 1px; color: #7d8590; margin-bottom: 10px; margin-top: 20px;
+      letter-spacing: 2px; color: var(--text-faint); margin-bottom: 16px; margin-top: 40px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .phase-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border-color);
     }
     .phase-label:first-of-type { margin-top: 0; }
 
     .jobs-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     /* ── JOB CARD ── */
     .job-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 14px 16px;
-      min-width: 180px;
-      max-width: 220px;
-      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 16px;
       cursor: pointer;
       text-decoration: none;
-      transition: border-color .2s, transform .1s;
+      transition: all 0.2s ease;
+      position: relative;
     }
-    .job-card:hover { border-color: #58a6ff; transform: translateY(-1px); }
-    .job-card.success { border-left: 3px solid #2ea043; }
-    .job-card.failure { border-left: 3px solid #da3633; }
-    .job-card.running { border-left: 3px solid #d29922; }
-    .job-card.skipped { border-left: 3px solid #484f58; opacity: .6; }
-    .job-card.pending { border-left: 3px solid #484f58; }
+    .job-card:hover { 
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.15); 
+      transform: translateY(-2px); 
+    }
+    
+    /* Ligne de couleur en haut de la carte selon le statut */
+    .job-card::before {
+      content: ''; position: absolute; top: -1px; left: 16px; right: 16px; height: 2px; border-radius: 2px; opacity: 0.8;
+    }
+    .job-card.success::before { background: var(--color-success); box-shadow: 0 2px 10px var(--color-success); }
+    .job-card.failure::before { background: var(--color-failure); box-shadow: 0 2px 10px var(--color-failure); }
+    .job-card.running::before { background: var(--color-running); box-shadow: 0 2px 10px var(--color-running); }
+    .job-card.skipped { opacity: 0.5; filter: grayscale(1); }
 
-    .jc-header { display: flex; align-items: center; gap: 8px; }
-    .jc-icon { font-size: 16px; flex-shrink: 0; }
-    .jc-name { font-size: 13px; font-weight: 600; color: #e6edf3; line-height: 1.3; }
-    .jc-dur  { font-size: 11px; color: #7d8590; margin-top: 1px; font-family: monospace; }
+    .jc-header { display: flex; align-items: center; gap: 14px; }
+    .jc-icon { 
+      font-size: 18px; flex-shrink: 0; 
+      background: rgba(255,255,255,0.05); 
+      width: 38px; height: 38px; 
+      display: flex; align-items: center; justify-content: center; 
+      border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .jc-name { font-size: 14px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; }
+    .jc-dur  { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;}
 
-    .jc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .jc-tags { display: flex; flex-wrap: wrap; gap: 8px; }
     .tag {
-      font-size: 10px; padding: 2px 7px; border-radius: 20px;
+      font-size: 11px; padding: 4px 10px; border-radius: 6px;
       font-weight: 500; border: 1px solid transparent;
     }
-    .tag.green  { background: #0d2e1a; color: #3fb950; border-color: #238636; }
-    .tag.blue   { background: #0c2446; color: #58a6ff; border-color: #1f6feb; }
-    .tag.purple { background: #2e1d4a; color: #bc8cff; border-color: #6e40c9; }
-    .tag.orange { background: #2d1f00; color: #e3b341; border-color: #9e6a03; }
-    .tag.red    { background: #2d0e0e; color: #f85149; border-color: #da3633; }
-    .tag.gray   { background: #1c2128; color: #7d8590; border-color: #30363d; }
+    .tag.green  { background: var(--color-success-bg); color: var(--color-success); border-color: rgba(16, 185, 129, 0.2); }
+    .tag.blue   { background: var(--color-accent-bg); color: var(--color-accent); border-color: rgba(59, 130, 246, 0.2); }
+    .tag.purple { background: rgba(168, 85, 247, 0.1); color: #c084fc; border-color: rgba(168, 85, 247, 0.2); }
+    .tag.orange { background: var(--color-running-bg); color: var(--color-running); border-color: rgba(245, 158, 11, 0.2); }
+    .tag.red    { background: var(--color-failure-bg); color: var(--color-failure); border-color: rgba(244, 63, 94, 0.2); }
+    .tag.gray   { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border-color: var(--border-color); }
 
-    /* ── SKELETON ── */
+    /* ── SUMMARY DASHBOARD ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .s-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .s-card::after {
+      content: ''; position: absolute; right: -20px; bottom: -20px; width: 80px; height: 80px;
+      background: radial-gradient(circle, currentColor 0%, transparent 70%); opacity: 0.05; border-radius: 50%;
+    }
+    .s-val  { font-size: 32px; font-weight: 600; letter-spacing: -1px; line-height: 1; }
+    .s-lbl  { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    /* ── MISC ── */
     .skeleton {
-      background: linear-gradient(90deg, #21262d 25%, #30363d 50%, #21262d 75%);
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
-      border-radius: 4px; height: 14px;
+      border-radius: 12px;
     }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
-    /* ── SUMMARY ── */
-    .summary {
-      display: flex;
-      gap: 16px;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
-    .s-item { display: flex; flex-direction: column; gap: 2px; }
-    .s-val  { font-size: 20px; font-weight: 700; }
-    .s-lbl  { font-size: 11px; color: #7d8590; }
-    .sep    { width: 1px; background: #21262d; align-self: stretch; }
-
     .error-box {
-      background: #2d0e0e; border: 1px solid #da3633; border-radius: 8px;
-      padding: 16px; color: #f85149; font-size: 13px;
+      background: var(--color-failure-bg); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 16px;
+      padding: 24px; color: var(--color-failure); font-size: 14px;
     }
 
     footer {
-      margin-top: 32px; font-size: 11px; color: #484f58;
+      margin-top: 60px; font-size: 12px; color: var(--text-faint);
       display: flex; justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 24px;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 20px; }
+      header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .refresh-btn { margin-left: 0; width: 100%; justify-content: center; }
+      .run-banner { flex-direction: column; align-items: flex-start; }
+      .run-badge { margin-left: 0; width: 100%; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">🔒</div>
-  <div>
-    <h1>SecureShare &mdash; Pipeline CI/CD DevSecOps</h1>
-    <p id="subtitle">Chargement en cours…</p>
+<div class="container">
+  <header>
+    <div class="logo">🔐</div>
+    <div>
+      <h1>DevSecOps Pipeline</h1>
+      <p id="subtitle">Initialisation de l'environnement...</p>
+    </div>
+    <button class="refresh-btn" onclick="load()">
+      <span id="refresh-icon">↻</span> Actualiser
+    </button>
+  </header>
+
+  <div id="run-banner"></div>
+  <div id="content">
+    <div class="skeleton" style="height:120px; margin-bottom:20px"></div>
+    <div class="skeleton" style="height:250px"></div>
   </div>
-  <button class="refresh-btn" onclick="load()">
-    <span id="refresh-icon">↻</span> Actualiser
-  </button>
-</header>
+  <div id="summary-bar"></div>
 
-<div id="run-banner"></div>
-<div id="content"><div class="skeleton" style="height:80px;margin-bottom:12px"></div><div class="skeleton" style="height:120px"></div></div>
-<div id="summary-bar"></div>
-
-<footer>
-  <span>SecureShare &mdash; Projet Fil Rouge DevSecOps &mdash; 2026</span>
-  <span id="last-update"></span>
-</footer>
+  <footer>
+    <span>SecureShare &mdash; Projet Fil Rouge &mdash; 2026</span>
+    <span id="last-update"></span>
+  </footer>
+</div>
 
 <script>
 const OWNER = 'yohanhebrard';
 const REPO  = 'securiterdanslesprojet';
 const WORKFLOW = 'ci.yml';
 
-// Map job names → tags décoratifs
 const JOB_META = {
-  'Backend Tests':        { tags: [['pytest','blue'],['33 tests','blue'],['70% cov','orange']], icon: '🧪' },
-  'Backend Security Scan':{ tags: [['Bandit','purple'],['Safety','purple'],['Semgrep','purple']], icon: '🔍' },
-  'Frontend Tests':       { tags: [['Vite build','blue'],['React 18','blue']], icon: '⚛️' },
-  'Frontend Security Scan':{ tags: [['ESLint Sec','purple'],['npm audit','purple']], icon: '🔍' },
-  'Secret Scanning':      { tags: [['TruffleHog','orange']], icon: '🔐' },
+  'Backend Tests':        { tags: [['pytest','blue'],['33 tests','gray'],['70% cov','gray']], icon: '🧪' },
+  'Backend Security Scan':{ tags: [['Bandit','purple'],['Safety','purple'],['Semgrep','purple']], icon: '🛡️' },
+  'Frontend Tests':       { tags: [['Vite build','blue'],['React 18','gray']], icon: '⚛️' },
+  'Frontend Security Scan':{ tags: [['ESLint Sec','purple'],['npm audit','purple']], icon: '🛡️' },
+  'Secret Scanning':      { tags: [['TruffleHog','orange']], icon: '🔑' },
   'Docker Build & Scan':  { tags: [['Trivy','orange'],['multi-stage','gray']], icon: '🐳' },
   'Security Summary':     { tags: [['7 outils','green']], icon: '📊' },
   'Push Docker Images':   { tags: [['ghcr.io','blue']], icon: '📦' },
@@ -205,18 +303,11 @@ const JOB_META = {
 };
 
 const PHASES = [
-  { label: '⚙️  Phase 1 – Intégration Continue (CI)', jobs: ['Backend Tests','Backend Security Scan','Frontend Tests','Frontend Security Scan','Secret Scanning'] },
-  { label: '🐳  Phase 2 – Build & Container Scan',     jobs: ['Docker Build & Scan','Security Summary'] },
-  { label: '🚀  Phase 3 – Déploiement Continu (CD)',   jobs: ['Push Docker Images','Deploy to Staging','Deploy to Production','Send Notifications'] },
+  { label: 'Phase 1 – Intégration Continue (CI)', jobs: ['Backend Tests','Backend Security Scan','Frontend Tests','Frontend Security Scan','Secret Scanning'] },
+  { label: 'Phase 2 – Build & Container Scan',     jobs: ['Docker Build & Scan','Security Summary'] },
+  { label: 'Phase 3 – Déploiement Continu (CD)',   jobs: ['Push Docker Images','Deploy to Staging','Deploy to Production','Send Notifications'] },
 ];
 
-function statusIcon(s) {
-  if (s === 'success')   return '✓';
-  if (s === 'failure')   return '✗';
-  if (s === 'in_progress' || s === 'queued') return '◌';
-  if (s === 'skipped')   return '⊘';
-  return '…';
-}
 function conclusionClass(c, s) {
   if (s === 'in_progress' || s === 'queued') return 'running';
   if (c === 'success') return 'success';
@@ -224,12 +315,14 @@ function conclusionClass(c, s) {
   if (c === 'skipped' || c === 'cancelled') return 'skipped';
   return 'pending';
 }
+
 function fmtDuration(start, end) {
   if (!start) return '';
   const s = Math.round((new Date(end || Date.now()) - new Date(start)) / 1000);
   if (s < 60) return `${s}s`;
   return `${Math.floor(s/60)}m ${s%60}s`;
 }
+
 function fmtDate(d) {
   return new Date(d).toLocaleString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
 }
@@ -239,17 +332,15 @@ async function load() {
   icon.classList.add('spin');
 
   try {
-    // 1. Dernier run du workflow
     const runsRes = await fetch(
       `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/runs?per_page=1`,
       { headers: { 'Accept': 'application/vnd.github+json' } }
     );
-    if (!runsRes.ok) throw new Error(`GitHub API: ${runsRes.status} – vérifiez que le repo est public`);
+    if (!runsRes.ok) throw new Error(`Erreur API GitHub (${runsRes.status}).`);
     const runsData = await runsRes.json();
     const run = runsData.workflow_runs?.[0];
     if (!run) throw new Error('Aucun run trouvé.');
 
-    // 2. Jobs du run
     const jobsRes = await fetch(run.jobs_url, { headers: { 'Accept': 'application/vnd.github+json' } });
     const jobsData = await jobsRes.json();
     const jobs = jobsData.jobs || [];
@@ -258,14 +349,14 @@ async function load() {
     renderJobs(jobs, run);
     renderSummary(run, jobs);
 
-    document.getElementById('subtitle').textContent =
-      `yohanhebrard / securiterdanslesprojet · branch: ${run.head_branch} · GitHub Actions`;
+    document.getElementById('subtitle').innerHTML = 
+      `Dépôt : <span style="color:var(--text-main); font-weight:500">${OWNER}/${REPO}</span> &nbsp;•&nbsp; Branche : <span style="color:var(--color-accent); font-weight:500">${run.head_branch}</span>`;
     document.getElementById('last-update').textContent =
-      'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
+      'Synchro : ' + new Date().toLocaleTimeString('fr-FR');
 
   } catch(e) {
     document.getElementById('content').innerHTML =
-      `<div class="error-box">❌ Impossible de charger les données GitHub Actions.<br><br><strong>${e.message}</strong><br><br>Le dépôt doit être <strong>public</strong> pour que l'API fonctionne sans token.</div>`;
+      `<div class="error-box">❌ Échec de la connexion à GitHub.<br><br><strong>${e.message}</strong></div>`;
     document.getElementById('run-banner').innerHTML = '';
   } finally {
     icon.classList.remove('spin');
@@ -276,17 +367,16 @@ function renderBanner(run) {
   const cls = conclusionClass(run.conclusion, run.status);
   const dot = cls === 'success' ? 'dot-success' : cls === 'failure' ? 'dot-failure' : cls === 'running' ? 'dot-running' : 'dot-pending';
   const badgeCls = cls === 'success' ? 'badge-success' : cls === 'failure' ? 'badge-failure' : 'badge-running';
-  const badgeTxt = cls === 'success' ? '✓ Réussi' : cls === 'failure' ? '✗ Échec' : '◌ En cours';
+  const badgeTxt = cls === 'success' ? 'Déploiement Réussi' : cls === 'failure' ? 'Échec Critique' : 'Analyse en cours...';
 
   document.getElementById('run-banner').innerHTML = `
-    <div class="run-banner">
+    <div class="run-banner fade-in">
       <div class="run-status-dot ${dot}"></div>
       <div>
-        <div class="run-title">${run.display_title || run.head_commit?.message?.split('\n')[0] || 'Run CI/CD'}</div>
+        <div class="run-title">${run.display_title || run.head_commit?.message?.split('\n')[0] || 'Pipeline CI/CD'}</div>
         <div class="run-meta">
-          Run #${run.run_number} &nbsp;·&nbsp; ${fmtDate(run.created_at)}
-          &nbsp;·&nbsp; Durée : ${fmtDuration(run.created_at, run.updated_at)}
-          &nbsp;·&nbsp; Déclenché par <strong>${run.triggering_actor?.login || '?'}</strong>
+          Exécution <strong>#${run.run_number}</strong> &nbsp;·&nbsp; Déclenchée le ${fmtDate(run.created_at)}
+          &nbsp;·&nbsp; ⏱ ${fmtDuration(run.created_at, run.updated_at)}
         </div>
       </div>
       <a href="${run.html_url}" target="_blank" class="run-badge ${badgeCls}">${badgeTxt}</a>
@@ -298,41 +388,42 @@ function renderJobs(jobs, run) {
   jobs.forEach(j => byName[j.name] = j);
 
   let html = '';
-  PHASES.forEach(phase => {
-    html += `<div class="phase-label">${phase.label}</div><div class="jobs-grid">`;
+  PHASES.forEach((phase, index) => {
+    html += `<div class="fade-in" style="animation-delay: ${index * 0.1}s">
+      <div class="phase-label">${phase.label}</div>
+      <div class="jobs-grid">`;
+    
     phase.jobs.forEach(name => {
       const j = byName[name];
-      const meta = JOB_META[name] || { tags: [], icon: '⚙️' };
+      const meta = JOB_META[name] || { tags: [], icon: '⚡' };
       if (!j) {
-        // job pas encore lancé
         html += `<div class="job-card pending">
           <div class="jc-header">
             <span class="jc-icon">${meta.icon}</span>
-            <div><div class="jc-name">${name}</div><div class="jc-dur">En attente…</div></div>
+            <div><div class="jc-name">${name}</div><div class="jc-dur">En attente...</div></div>
           </div></div>`;
         return;
       }
       const cls = conclusionClass(j.conclusion, j.status);
-      const icon = statusIcon(j.conclusion || j.status);
       const dur = fmtDuration(j.started_at, j.completed_at);
       const tagHtml = meta.tags.map(([t,c]) => `<span class="tag ${c}">${t}</span>`).join('');
-      // ajouter tag status si failure
-      const extraTag = cls === 'failure' ? `<span class="tag red">✗ Échec</span>` :
-                       cls === 'success' ? `<span class="tag green">✓ OK</span>` :
-                       cls === 'running' ? `<span class="tag orange">◌ Actif</span>` : '';
+      
+      const statusTag = cls === 'failure' ? `<span class="tag red">Échec</span>` :
+                        cls === 'success' ? `<span class="tag green">Succès</span>` :
+                        cls === 'running' ? `<span class="tag orange">En cours</span>` : '';
 
       html += `<a class="job-card ${cls}" href="${j.html_url}" target="_blank">
         <div class="jc-header">
           <span class="jc-icon">${meta.icon}</span>
           <div>
             <div class="jc-name">${j.name}</div>
-            <div class="jc-dur">${dur ? '⏱ ' + dur : '…'}</div>
+            <div class="jc-dur">⏱ ${dur || 'Calcul...'}</div>
           </div>
         </div>
-        <div class="jc-tags">${tagHtml}${extraTag}</div>
+        <div class="jc-tags">${statusTag}${tagHtml}</div>
       </a>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   });
 
   document.getElementById('content').innerHTML = html;
@@ -344,20 +435,23 @@ function renderSummary(run, jobs) {
   const failed  = jobs.filter(j => j.conclusion === 'failure').length;
 
   document.getElementById('summary-bar').innerHTML = `
-    <div class="summary">
-      <div class="s-item"><span class="s-val" style="color:#3fb950">${success}/${total}</span><span class="s-lbl">Jobs réussis</span></div>
-      <div class="sep"></div>
-      <div class="s-item"><span class="s-val" style="color:${failed>0?'#f85149':'#3fb950'}">${failed}</span><span class="s-lbl">Échecs</span></div>
-      <div class="sep"></div>
-      <div class="s-item"><span class="s-val" style="color:#58a6ff">70%</span><span class="s-lbl">Couverture code</span></div>
-      <div class="sep"></div>
-      <div class="s-item"><span class="s-val" style="color:#3fb950">0</span><span class="s-lbl">Secrets détectés</span></div>
-      <div class="sep"></div>
-      <div class="s-item"><span class="s-val" style="color:#3fb950">0</span><span class="s-lbl">CVE critiques</span></div>
-      <div class="sep"></div>
-      <div class="s-item"><span class="s-val" style="color:#e3b341">7</span><span class="s-lbl">Outils sécu</span></div>
-      <div class="sep"></div>
-      <div class="s-item"><span class="s-val" style="color:#bc8cff">AES-256</span><span class="s-lbl">Chiffrement</span></div>
+    <div class="summary-grid fade-in" style="animation-delay: 0.3s">
+      <div class="s-card" style="color: var(--color-success)">
+        <span class="s-val">${success}/${total}</span>
+        <span class="s-lbl" style="color: var(--text-main)">Jobs Validés</span>
+      </div>
+      <div class="s-card" style="color: ${failed > 0 ? 'var(--color-failure)' : 'var(--text-muted)'}">
+        <span class="s-val">${failed}</span>
+        <span class="s-lbl" style="color: var(--text-main)">Échecs</span>
+      </div>
+      <div class="s-card" style="color: var(--color-accent)">
+        <span class="s-val">70%</span>
+        <span class="s-lbl" style="color: var(--text-main)">Couverture Test</span>
+      </div>
+      <div class="s-card" style="color: var(--color-success)">
+        <span class="s-val">0</span>
+        <span class="s-lbl" style="color: var(--text-main)">Failles Critiques</span>
+      </div>
     </div>`;
 }
 
